@@ -1,19 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2024/5/4 21:26
-# @Author  : CaoXiang
+# @Time    : 2024/5/10 22:48
+# @Author  : 作者名
 # @File    : base_func.py
-# @Description  : AI精灵的基本function calling实现
-
-def get_weather(city):
-    """
-
-    @param city:
-    @return:
-    """
-    pass
-
-
+# @Description  :
 def get_base_info():
     """
         介绍精灵牛牛的身份
