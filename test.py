@@ -24,12 +24,14 @@ def chat_with_model(
     messages.append({"role": "user", "content": prompt})
 
     while True:
+        #print(messages)
         answer = run_conversation(client=client,
                                   messages=messages,
                                   functions_list=functions_list,
                                   model=model)
 
         print(f"牛牛精灵: {answer}")
+        messages.append({"role": "assistant", "content": answer})
 
         # 询问用户是否还有其他问题
         user_input = input("您还有其他问题吗？(输入退出以结束对话): ")
