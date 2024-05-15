@@ -12,7 +12,7 @@ from config.conf_loader import YamlConfigLoader
 from util.tools import auto_functions, run_conversation
 from brain import outer_func as func
 import inspect
-
+from lxml import etree
 
 def chat_with_model(
         client=None,
@@ -50,3 +50,45 @@ if __name__ == '__main__':
     client = OpenAI()
     function_list = [globals()[i[0]] for i in inspect.getmembers(func, inspect.isfunction)]
     chat_with_model(client=client, functions_list=function_list, prompt="你好呀", model="gpt-4-turbo-preview")
+
+
+    #import requests
+
+    # Step 1.构建请求
+    # url = "https://www.googleapis.com/customsearch/v1"
+    # google_search_key = conf_loader.attempt_load_param("google-search-api-key")
+    # cse_id = conf_loader.attempt_load_param("google-search-cse-id")
+    # # Step 2.设置查询参数
+    # params = {
+    #     'q': "OpenAI",           # 搜索关键词
+    #     'key': google_search_key,   # 谷歌搜索API Key
+    #     'cx': cse_id                # CSE ID
+    # }
+    #
+    # # Step 3.发送GET请求
+    # response = requests.get(url, params=params)
+    #
+    # # Step 4.解析响应
+    # data = response.json()
+    # print(data)
+    from duckduckgo_search import DDGS
+
+    # with DDGS(proxies="http://localhost:7890", timeout=20) as ddgs:
+    #     results = [r for r in ddgs.text("python site:www.zhihu.com", max_results=5)]
+    #     print(results[-1])
+    # headers = {
+    #     'authority': 'www.zhihu.com',
+    #     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    #     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    #     'cache-control': 'max-age=0',
+    #     'cookie': "Your cookie",  # 需要手动获取cookie
+    #     'upgrade-insecure-requests': '1',
+    #     'user-agent': 'Your user-agent',  # 手动编写或者选择之后给出的user-agent选项选择其一填写
+    # }
+    # url = 'https://www.zhihu.com/question/589955237'
+    # res = requests.get(url, headers=headers).text
+    # print(res)
+    # res_xpath = etree.HTML(res)
+
+
+

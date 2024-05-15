@@ -7,13 +7,15 @@
 import json
 import requests
 import os
+
+
 def get_weather(loc):
     """
     查询即时天气的函数
     :param loc: 必要参数，字符串类型，用于表示查询天气的具体城市名称， \
     注意，中国的城市需要用对应城市的英文名称代替，例如如果需要查询北京市天气，则loc参数需要输入'Beijing'；
     :return: OpenWeather API查询即时天气的结果，具体URL请求地址为：https://api.openweathermap.org/data/2.5/weather\
-    返回结果对象类型为解析之后的JSON格式对象，并用字符串形式进行表示，其中包含了全部重要的天气信息
+    返回结果对象类型为解析之后的JSON格式对象，并用字符串形式进行表示，其中包含了全部重要的天气信息。
     """
     # Step 1.构建请求
     url = "https://api.openweathermap.org/data/2.5/weather"
@@ -34,5 +36,24 @@ def get_weather(loc):
     return json.dumps(data)
 
 
+def get_latest_news():
+    """
+    获取微博热搜榜的函数
+    @return: 返回结果对象类型为解析之后的JSON格式对象，并用字符串形式进行表示，其中包含了全部的微博热榜信息。
+    """
+    url = "https://api.zlinblog.cn/single/rank"
+    params = {
+        "platform": "微博",
+        "rank_name": "热搜"
+    }
+    headers = {
+        "User-Agent": "PostmanRuntime/7.29.0",
+        "X-Licence": "ROJ8tVE1sTRIj0BB1702183754479cd3118c1197ecNhLQleSe6004dd4bc9a386"
+    }
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
+    return json.dumps(data)
 
 
+if __name__ == '__main__':
+    print(get_latest_news())
