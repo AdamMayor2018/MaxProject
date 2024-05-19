@@ -7,8 +7,9 @@
 import json
 import requests
 import os
-
-
+from lxml import etree
+from duckduckgo_search import DDGS
+from util.search_tools import get_search_content
 def get_weather(loc):
     """
     查询即时天气的函数
@@ -54,6 +55,24 @@ def get_latest_news():
     data = response.json()
     return json.dumps(data)
 
+def search_internet(query):
+    """
+    搜索互联网的函数，当你无法回答某个问题时，调用该函数，能够获得答案。
+    @param query: 必要参数，字符串类型，用于表示搜索的查询的搜索词，注意，该语句需要符合互联网搜索的语法规则。
+    @return: 返回结果对象类型为解析之后的JSON格式对象，并用字符串形式进行表示，其中包含了搜索结果。
+    """
+    print(f"牛牛精灵: 还没学过这个，稍等我去查查...")
+    with DDGS(proxy="http://localhost:7890", timeout=20) as ddgs:
+        results = [r for r in ddgs.text(f"{query}:www.zhihu.com", max_results=5)]
+        for r in results:
+            url = r["href"]
+            r['content'] = get_search_content(url)
+        #print("query:", results)
+        return json.dumps(results)
+
+
+
 
 if __name__ == '__main__':
-    print(get_latest_news())
+    #print(get_latest_news())
+    print(search_internet("2024歌手比赛"))

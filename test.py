@@ -9,7 +9,7 @@ from brain.outer_func import *
 from openai import OpenAI
 import os
 from config.conf_loader import YamlConfigLoader
-from util.tools import auto_functions, run_conversation
+from util.chat_tools import auto_functions, run_conversation
 from brain import outer_func as func
 import inspect
 from lxml import etree
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # 初始化openai大脑
     client = OpenAI()
     function_list = [globals()[i[0]] for i in inspect.getmembers(func, inspect.isfunction)]
-    chat_with_model(client=client, functions_list=function_list, prompt="你好呀", model="gpt-4-turbo-preview")
+    chat_with_model(client=client, functions_list=function_list, prompt="你好呀", model="gpt-4o")
 
 
     #import requests
