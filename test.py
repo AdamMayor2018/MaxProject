@@ -18,7 +18,7 @@ def chat_with_model(
         client=None,
         functions_list=None,
         prompt="你好呀",
-        model="gpt-4-turbo-preview",
+        model="gpt-4o",
         system_message=[{"role": "system", "content": get_base_info()}]):
     messages = system_message
     messages.append({"role": "user", "content": prompt})

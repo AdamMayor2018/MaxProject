@@ -9,6 +9,9 @@ import pandas as pd
 import numpy as np
 import json
 import openai
+import tiktoken
+
+
 def auto_functions(client, functions_list):
     """
     Chat模型的functions参数编写函数
@@ -93,7 +96,7 @@ def auto_functions(client, functions_list):
     return functions
 
 
-def run_conversation(client, messages, functions_list=None, model="gpt-4-turbo-preview"):
+def run_conversation(client, messages, functions_list=None, model="gpt-4o"):
     """
     能够自动执行外部函数调用的Chat对话模型
     :param messages: 必要参数，字典类型，输入到Chat模型的messages参数对象
@@ -158,3 +161,11 @@ def run_conversation(client, messages, functions_list=None, model="gpt-4-turbo-p
             final_response = response_message.content
 
     return final_response
+
+
+def cut_by_token(message, model="gpt-4o", token_limit=4096):
+    encoding = tiktoken.encoding_for_model(model)
+    token_size = len(encoding.encode(message))
+    if token_size > token_limit:
+        message = message[:token_limit]
+    return message

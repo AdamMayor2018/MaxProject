@@ -6,7 +6,9 @@
 # @Description  : 爬虫和搜索相关的函数
 import requests
 from lxml import etree
-def get_search_content(url):
+import tiktoken
+from util.chat_tools import cut_by_token
+def get_search_content(url, model="gpt-4o", token_limit=4096):
     # TODO 改为动态获取cookie方式，如cookiejar
     cookie = 'SESSIONID=mocjbJY9RHsFgHmfv7sQddCCbWgVGGjrMv969aag8Ec; JOID=UFEVBkumDH5NkVRTeqHlJjAuDj9gjiZYa7B8eVyHJFRrt3V7ULoKNCyYVl96u72gch2wUuHyIduR1TVgDb8UpvQ=; osd=V1EcBEKhDHdPmFNTc6PsITAnDDZnji9aYrd8cF6OI1RitXx8ULMIPSuYX11zvL2pcBS3UujwKNyR3DdpCr8dpP0=; _zap=dde3224e-3fcd-47f3-a08a-68b2672d52bf; d_c0=AHDWbSa6FhiPTqvFbznrTe8i6KF1km5uaog=|1706622053; __snaker__id=zzngQdqP5NmL3apK; q_c1=baee8a8673824034b31038dd2d53e353|1708433550000|1708433550000; z_c0=2|1:0|10:1715782986|4:z_c0|80:MS4xXzFTY0F3QUFBQUFtQUFBQVlBSlZUWDZiSkdkdTVvWjJEWlJCTzZqcXc2dF9kYm9qVk5MSnhnPT0=|f97dcac3a25a79f90f6644cc34097523ec462e920eaba9d2717283c2b8039f7e; _xsrf=abf80057-592d-43b5-9057-2c1f5b91c6b1; Hm_lvt_98beee57fd2ef70ccdd5ca52b9740c49=1715325516,1715782084,1715782985,1716128284; Hm_lpvt_98beee57fd2ef70ccdd5ca52b9740c49=1716128284; BEC=5b38c4d5f0c2e09ceae9a4f725f48e8f; KLBRSID=37f2e85292ebb2c2ef70f1d8e39c2b34|1716128286|1716128283'
     headers = {
@@ -50,7 +52,7 @@ def get_search_content(url):
     for t in text_d:
         txt = str(t).replace('\n', ' ')
         text += txt
-
+    text = cut_by_token(text, model, token_limit=token_limit)
     # 如果有code，则将code追加到正文的追后面
     if code_:
         for c in code_:
