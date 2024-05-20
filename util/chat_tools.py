@@ -169,3 +169,21 @@ def cut_by_token(message, model="gpt-4o", token_limit=4096):
     if token_size > token_limit:
         message = message[:token_limit]
     return message
+
+
+def convert_keyword(client, model, q):
+    """
+    将用户输入的问题转化为适合在知乎上进行搜索的关键词
+    """
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system",
+             "content": "你专门负责将用户的问题转化为知乎网站搜索关键词，只返回一个你认为最合适的搜索关键词即可"},
+            {"role": "user", "content": "请问，gpt-4o微调总共分为几步？"},
+            {"role": "assistant", "content": "gpt-4o微调流程"},
+            {"role": "user", "content": q}
+        ]
+    )
+    q = response.choices[0].message.content
+    return q
