@@ -50,5 +50,6 @@ if __name__ == '__main__':
     client = OpenAI()
     function_list = [globals()[i[0]] for i in inspect.getmembers(func, inspect.isfunction)]
     chat_with_model(client=client, functions_list=function_list, prompt="你好呀", model="gpt-4o")
+    print("xx")
 
 
