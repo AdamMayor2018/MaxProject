@@ -69,7 +69,7 @@ def auto_functions(client, functions_list):
                           请帮我仿造类似的格式为当前函数创建一个function对象。' % (function_name, function_description)
 
             response = client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-4o",
                 messages=[
                     {"role": "user", "name": "example_user", "content": user_message1},
                     {"role": "assistant", "name": "example_assistant", "content": assistant_message1},
