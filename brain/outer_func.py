@@ -11,6 +11,11 @@ from lxml import etree
 from duckduckgo_search import DDGS
 from util.search_tools import get_search_content
 from util.chat_tools import cut_by_token, convert_keyword
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+
 def get_weather(loc):
     """
     查询即时天气的函数
@@ -56,6 +61,7 @@ def get_latest_news():
     data = response.json()
     return json.dumps(data)
 
+
 def search_internet(query, model="gpt-4o", token_limit=4096):
     """
     搜索互联网的函数，当你无法回答某个问题时，调用该函数，能够获得答案。
@@ -72,12 +78,52 @@ def search_internet(query, model="gpt-4o", token_limit=4096):
             url = r["href"]
             content = get_search_content(url, model, token_limit=token_limit)
             r['content'] = content
-        #print("query:", results)
+        # print("query:", results)
         return json.dumps(results)
 
 
+def send_email(subject, content):
+    """
+    发送邮件的函数
+    @param subject: 必要参数，字符串类型，用于表示邮件主题，注意，该语句需要符合邮件主题的语法规则。
+    @param content: 必要参数，字符串类型，用于表示邮件正文，注意，该语句需要符合邮件正文的语法规则。
+    @return: 无返回值，该函数会直接发送邮件，无需返回任何结果。
+    """
+    # 创建邮件对象和设置邮件内容
+    message = MIMEMultipart("alternative")
+
+    # 邮件发送者和接收者
+    sender_email = "1224325287@qq.com"
+    receiver_email = "caoxiang@yangshipin.cn"
+    password = "授权码"  # 此处输入你的授权码
+
+    # 创建邮件对象和设置邮件内容
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "邮件主题"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    # 创建邮件正文
+    text = ""
+    # 添加文本和HTML的部分
+    part1 = MIMEText(text, "plain")
+
+    # 添加正文到邮件对象中
+    message.attach(part1)
+
+    # 发送邮件
+    try:
+        # QQ邮箱的SMTP服务器地址
+        server = smtplib.SMTP_SSL("smtp.qq.com", 465)
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+        print("邮件发送成功")
+    except Exception as e:
+        print(f"邮件发送失败: {e}")
+    finally:
+        server.quit()
 
 
 if __name__ == '__main__':
     print(get_latest_news())
-    #print(search_internet("2024歌手比赛"))
+    # print(search_internet("2024歌手比赛"))
