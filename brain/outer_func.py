@@ -19,6 +19,8 @@ import email
 from email.header import decode_header
 import re
 import quopri
+
+
 def get_weather(loc):
     """
     查询即时天气的函数
@@ -95,7 +97,7 @@ def send_email(subject, content, receiver_email):
     """
     # 邮件发送者和接收者
     sender_email = "1224325287@qq.com"
-    #receiver_email = "caoxiang@yangshipin.cn"
+    # receiver_email = "caoxiang@yangshipin.cn"
     password = os.environ["QQ_MAIL_KEY"]  # 此处输入你的授权码
     print(password)
 
@@ -118,7 +120,7 @@ def send_email(subject, content, receiver_email):
         server = smtplib.SMTP_SSL("smtp.qq.com", 465)
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
-        info ="邮件发送成功"
+        info = "邮件发送成功"
     except Exception as e:
         print(f"邮件发送失败: {e}")
         info = f"邮件发送失败： 错误的原因是： {e}"
@@ -126,13 +128,19 @@ def send_email(subject, content, receiver_email):
         server.quit()
         return info
 
+
 def get_email(num=1, type="All"):
     """
     @param num: 必要参数，整数类型，用于表示查询邮件的个数，注意，该语句需要符合邮件主题的语法规则。如果没有明确表示的话，默认查询最新的1封邮件。
     需要查询邮件信息的时候调用该函数
     @param type: 必要参数，字符串类型，用于表示查询邮件的类型，默认为All,代表全部的邮件。如果指定是未读邮件，则为UnSeen。
     需要查询邮件信息的时候调用该函数
-    @return: 返回json字符串，表明了查询到的若干封邮件信息。
+    @return: 一个列表，其中每个元素都是一个字典，表示一封邮件。每个字典包含以下键：
+    'subject': 邮件主题。
+    'date': 邮件的发送日期。
+    'from': 发件人的邮箱地址。
+    'to': 收件人的邮箱地址。
+    'content': 邮件的内容。
     """
     # 创建 IMAP4 对象并连接到邮件服务器
     mail = imaplib.IMAP4_SSL("smtp.qq.com")
@@ -159,9 +167,10 @@ def get_email(num=1, type="All"):
         # 解析邮件数据
         email_message = email.message_from_bytes(raw_message)
         # 获取主题
-        msgCharset = email.header.decode_header(email_message.get('Subject'))[0][1]  # 获取邮件标题并进行进行解码，通过返回的元组的第一个元素我们得知消息的编码
+        msgCharset = email.header.decode_header(email_message.get('Subject'))[0][
+            1]  # 获取邮件标题并进行进行解码，通过返回的元组的第一个元素我们得知消息的编码
         subject = decode_header(email_message["Subject"])[0][0].decode(msgCharset)
-        #获取日期
+        # 获取日期
         date = decode_header(email_message["Date"])[0][0]
         # 获取发件人
         from_address = decode_header(email_message["From"])[0][0].decode(msgCharset)
@@ -181,9 +190,9 @@ def get_email(num=1, type="All"):
 
     return json.dumps(messages)
 
+
 if __name__ == '__main__':
-    #send_email("测试邮件", "测试邮件内容")
-    #print(get_latest_news())
+    # send_email("测试邮件", "测试邮件内容")
+    # print(get_latest_news())
     # print(search_internet("2024歌手比赛"))
     print(get_email(2))
-
