@@ -19,6 +19,8 @@ import email
 from email.header import decode_header
 import re
 import quopri
+from docx import Document
+from pathlib import Path
 
 
 def get_weather(loc):
@@ -131,8 +133,8 @@ def send_email(subject, content, receiver_email):
 
 def get_email(num=1, type="All"):
     """
-    @param num: 必要参数，整数类型，用于表示查询邮件的个数，注意，该语句需要符合邮件主题的语法规则。如果没有明确表示的话，默认查询最新的1封邮件。
     需要查询邮件信息的时候调用该函数
+    @param num: 必要参数，整数类型，用于表示查询邮件的个数，注意，该语句需要符合邮件主题的语法规则。如果没有明确表示的话，默认查询最新的1封邮件。
     @param type: 必要参数，字符串类型，用于表示查询邮件的类型，默认为All,代表全部的邮件。如果指定是未读邮件，则为UnSeen。
     需要查询邮件信息的时候调用该函数
     @return: 一个列表，其中每个元素都是一个字典，表示一封邮件。每个字典包含以下键：
@@ -191,8 +193,29 @@ def get_email(num=1, type="All"):
     return json.dumps(messages)
 
 
+def read_docx(file_path: str):
+    """
+    需要读取外部文档信息的时候调用该函数
+    @param file_path: 必要参数，字符串类型，用于表示本地文档的路径
+    @return: 返回字符串，表示提取到的文档信息，如果顺利读取则返回文档信息，如果发生错误，则返回错误提示。
+    """
+    # 加载Word文档
+    try:
+        print(f"牛牛精灵: 正在尝试读取本地文档：{file_path}...")
+        doc = Document(str(Path(file_path)))
+    except:
+        text = "提供的本地地址错误，请检查！"
+        return text
+    # 提取文档文本内容
+    text = []
+    for para in doc.paragraphs:
+        text.append(para.text)
+    return '\n'.join(text)
+
+
 if __name__ == '__main__':
     # send_email("测试邮件", "测试邮件内容")
     # print(get_latest_news())
     # print(search_internet("2024歌手比赛"))
-    print(get_email(2))
+    # print(get_email(2))
+    print(read_docx(r"E:\adamcx\央视频项目\2024年\党员学习\纪律处分条例学习心得\个人学习心得-曹翔.docx"))
