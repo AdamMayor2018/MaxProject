@@ -175,7 +175,7 @@ def get_email(num=1, type="All"):
         # 获取日期
         date = decode_header(email_message["Date"])[0][0]
         # 获取发件人
-        from_address = decode_header(email_message["From"])[0][0].decode(msgCharset)
+        from_address = decode_header(email_message["From"])[0][0]
         # 获取收件人
         to_address = decode_header(email_message["To"])[0][0]
         # 获取邮件正文
@@ -211,6 +211,23 @@ def read_docx(file_path: str):
     for para in doc.paragraphs:
         text.append(para.text)
     return '\n'.join(text)
+
+def tarot_predict():
+    """
+    使用塔罗牌进行每日占卜的函数
+    @return: 返回结果对象类型为解析之后的JSON格式对象，并用字符串形式进行表示，其中包含了全部的占卜信息。
+    """
+    url = "https://api.yuanfenju.com/index.php/v1/Zhanbu/meiri"
+    params = {
+        "api_key": os.environ["TAROT_API_KEY"],
+    }
+    headers = {
+        "User-Agent": "PostmanRuntime/7.29.0",
+        "Content-Type": "String"
+    }
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
+    return json.dumps(data)
 
 
 if __name__ == '__main__':

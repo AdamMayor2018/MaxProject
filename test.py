@@ -47,6 +47,7 @@ if __name__ == '__main__':
     os.environ["OPENAI_API_KEY"] = conf_loader.attempt_load_param("api-key")
     os.environ["OPEN_WEATHER_API_KEY"] = conf_loader.attempt_load_param("open-weather-api-key")
     os.environ["QQ_MAIL_KEY"] = conf_loader.attempt_load_param("qq-mail-key")
+    os.environ["TAROT_API_KEY"] = conf_loader.attempt_load_param("tarot-api-key")
     # 初始化openai大脑
     client = OpenAI()
     function_list = [globals()[i[0]] for i in inspect.getmembers(func, inspect.isfunction)]
