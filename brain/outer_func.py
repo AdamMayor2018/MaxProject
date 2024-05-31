@@ -213,66 +213,6 @@ def check_unread_emails(from_address, type='Unseen'):
     mail.logout()
 
     return json.dumps(result, ensure_ascii=False)
-# def get_email(num=1, type="All"):
-#     """
-#     需要查询邮件信息的时候调用该函数，该函数使用QQ邮箱的SMTP服务进行邮件处理。
-#     @param num: 必要参数，整数类型，用于表示查询邮件的个数，注意，该语句需要符合邮件主题的语法规则。如果没有明确表示的话，默认查询最新的1封邮件。
-#     @param type: 必要参数，字符串类型，用于表示查询邮件的类型，默认为All,代表全部的邮件。如果指定是未读邮件，则为UnSeen。
-#     需要查询邮件信息的时候调用该函数
-#     @return: 一个列表，其中每个元素都是一个字典，表示一封邮件。每个字典包含以下键：
-#     'subject': 邮件主题。
-#     'date': 邮件的发送日期。
-#     'from': 发件人的邮箱地址。
-#     'to': 收件人的邮箱地址。
-#     'content': 邮件的内容。
-#     """
-#     # 创建 IMAP4 对象并连接到邮件服务器
-#     mail = imaplib.IMAP4_SSL("smtp.qq.com")
-#     email_address = "1224325287@qq.com"
-#     password = os.environ["QQ_MAIL_KEY"]
-#     # 登录到邮件服务器
-#     mail.login(email_address, password)
-#     # 选择邮件目录
-#     mail.select('inbox')
-#     # 搜索邮件
-#     print("type:", type)
-#     status, messages = mail.search(None, type)
-#     # 获取邮件列表
-#     ids = messages[0]
-#     id_list = ids.split()
-#     # 获取最新的邮件
-#     wanted_ids = id_list[-num:]
-#     messages = []
-#     for email_id in wanted_ids:
-#         # 获取邮件的详细信息
-#         status, email_data = mail.fetch(email_id, '(RFC822)')
-#         # 解码邮件
-#         raw_message = email_data[0][1]
-#         # 解析邮件数据
-#         email_message = email.message_from_bytes(raw_message)
-#         # 获取主题
-#         msgCharset = email.header.decode_header(email_message.get('Subject'))[0][
-#             1]  # 获取邮件标题并进行进行解码，通过返回的元组的第一个元素我们得知消息的编码
-#         subject = decode_header(email_message["Subject"])[0][0].decode(msgCharset)
-#         # 获取日期
-#         date = decode_header(email_message["Date"])[0][0]
-#         # 获取发件人
-#         from_address = decode_header(email_message["From"])[0][0]
-#         # 获取收件人
-#         to_address = decode_header(email_message["To"])[0][0]
-#         # 获取邮件正文
-#         for part in email_message.walk():
-#             if not part.is_multipart():
-#                 name = part.get_param("name")
-#                 if not name:  # 如果邮件内容不是附件可以打印输出
-#                     content = part.get_payload(decode=True).decode(msgCharset)
-#         message = {"subject": subject, "date": date, "from": from_address, "to": to_address, "content": content}
-#         messages.append(message)
-#     # 关闭连接
-#     mail.close()
-#     mail.logout()
-#
-#     return json.dumps(messages)
 
 
 def read_docx(file_path: str):
