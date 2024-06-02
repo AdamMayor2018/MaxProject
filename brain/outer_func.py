@@ -131,7 +131,7 @@ def send_email(subject, content, receiver_email):
         return info
 
 
-def check_unread_emails(from_address, type='Unseen'):
+def get_latest_mail(from_address, type='Unseen'):
     """
     该函数用于查询邮箱中是否有来自指定发件人的未读邮件，并解读最近一封未读邮件的内容。
     @param from_address: 必要参数，字符串类型，发件方的邮箱地址。
