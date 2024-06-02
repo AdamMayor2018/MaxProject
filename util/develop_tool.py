@@ -111,6 +111,27 @@ def extract_function_code(s, detail=0, tested=False, g=globals()):
     return function_name
 
 
+def show_functions(tested=False, if_print=False):
+    """
+    打印tested或untested文件夹内全部函数
+    """
+    current_directory = os.getcwd()
+    if tested == False:
+        directory = current_directory + '\\functions\\untested functions'
+    else:
+        directory = current_directory + '\\functions\\tested functions'
+    files_and_directories = os.listdir(directory)
+    # 过滤结果，只保留.py文件和非__pycache__文件夹
+    files_and_directories = files_and_directories = [name for name in files_and_directories if (
+                os.path.splitext(name)[1] == '.py' or os.path.isdir(
+            os.path.join(directory, name))) and name != "__pycache__"]
+
+    if if_print != False:
+        for name in files_and_directories:
+            print(name)
+
+    return files_and_directories
+
 if __name__ == '__main__':
     conf_loader = YamlConfigLoader(yaml_path="../config/config.yaml")
     os.environ["OPENAI_API_KEY"] = conf_loader.attempt_load_param("api-key")
