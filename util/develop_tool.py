@@ -4,6 +4,7 @@
 # @File : develop_tool.py
 # @Software: PyCharm
 # @Description: 大模型参与开发工具
+import json
 import re
 from openai import OpenAI
 import os
@@ -123,14 +124,86 @@ def show_functions(tested=False, if_print=False):
     files_and_directories = os.listdir(directory)
     # 过滤结果，只保留.py文件和非__pycache__文件夹
     files_and_directories = files_and_directories = [name for name in files_and_directories if (
-                os.path.splitext(name)[1] == '.py' or os.path.isdir(
-            os.path.join(directory, name))) and name != "__pycache__"]
+            os.path.splitext(name)[1] == '.py' or os.path.isdir(
+        os.path.join(directory, name))) and name != "__pycache__"]
 
     if if_print != False:
         for name in files_and_directories:
             print(name)
 
     return files_and_directories
+
+
+def prompt_modified(function_name, system_content='推理链修改.md', model="gpt-4o", g=globals()):
+    """
+    智能邮件项目的外部函数审查函数，用于审查外部函数创建流程提示是否正确以及最终创建的代码是否正确
+    :param function_name: 必要参数，字符串类型，表示审查对象名称；
+    :param system_content: 可选参数，默认取值为字符串推理链修改.md，表示此时审查函数外部挂载文档名称，需要是markdwon格式文档；
+    :param model: 可选参数，表示调用的Chat模型，默认选取gpt-4-0613；
+    :param g: 可选参数，表示extract_function_code函数作用域，默认为globals()，即在当前操作空间全域内生效；
+    :return：审查结束后新创建的函数名称
+    """
+    print("正在执行审查函数，审查对象：%s" % function_name)
+    with open(system_content, 'r', encoding='utf-8') as f:
+        md_content = f.read()
+
+    # 读取原函数全部提示内容
+    with open('./functions/untested functions/%s/%s_prompt.json' % (function_name, function_name), 'r') as f:
+        msg = json.load(f)
+
+    # 将其保存为字符串
+    msg_str = json.dumps(msg)
+
+    # 进行审查
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": md_content},
+            {"role": "user", "content": '以下是一个错误的智能邮件项目的推理链，请你按照要求对其进行修改：%s' % msg_str}
+        ]
+    )
+
+    modified_result = response.choices[0].message['content']
+
+    def extract_json(s):
+        pattern = r'```[jJ][sS][oO][nN]\s*({.*?})\s*```'
+        match = re.search(pattern, s, re.DOTALL)
+        if match:
+            return match.group(1)
+        else:
+            return s
+
+    modified_json = extract_json(modified_result)
+
+    # 提取函数源码
+    code = json.loads(modified_json)['stage2'][1]['content']
+
+    # 提取函数名
+    match = re.search(r'def (\w+)', code)
+    function_name = match.group(1)
+
+    print("审查结束，新的函数名称为：%s。\n正在运行该函数定义过程，并保存函数源码与prompt" % function_name)
+
+    exec(code, g)
+
+    # 在untested文件夹内创建函数同名文件夹
+    directory = './functions/untested functions/%s' % function_name
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # 写入函数
+    with open('./functions/untested functions/%s/%s_module.py' % (function_name, function_name), 'w',
+              encoding='utf-8') as f:
+        f.write(code)
+
+    # 写入提示
+    with open('./functions/untested functions/%s/%s_prompt.json' % (function_name, function_name), 'w') as f:
+        json.dump(json.loads(modified_json), f)
+
+    print('新函数提示示例保存在./functions/untested functions/%s/%s_prompt.json文件中' % (function_name, function_name))
+    print("%s函数已在当前操作空间定义，可以进行效果测试" % function_name)
+
+    return function_name
 
 if __name__ == '__main__':
     conf_loader = YamlConfigLoader(yaml_path="../config/config.yaml")
@@ -187,12 +260,20 @@ if __name__ == '__main__':
     # print(response_message.content)
     # print(extract_function_code(response_message.content, detail=1, tested=False))
     # 第一阶段LtM_CD阶段提示词及输出结果
-    system_messages = {"system_message_CD": [{"role": "system",
-                                              "content": "为了更好编写满足用户需求的python函数，我们需要先识别用户需求中的变量，以作为python函数的参数。需要注意的是，当前编写的函数中涉及到的邮件收发查阅等功能，都是通过调用QQ邮箱SMTP服务来完成。"}],
-                       "system_message_CM": [{"role": "system",
-                                              "content": "我现在已拿到QQ SMTP服务授权，授权码保存在环境变量'qq-mail-key'中。我的邮箱地址保存在环境变量'qq-email-address'中，函数参数必须是字符串类型对象，函数返回结果必须是json表示的字符串对象。"}],
-                       "system_message": [{"role": "system",
-                                           "content": "我现在已拿到QQ SMTP服务授权，授权码保存在环境变量'qq-mail-key'中。我的邮箱地址保存在环境变量'qq-email-address'中，函数参数必须是字符串类型对象，函数返回结果必须是json表示的字符串对象。"}]}
+    with open("../prompts/推理链修改.md", "r", encoding="utf-8") as f:
+        md_content = f.read()
+        #print(md_content)
 
-    with open('../prompts/%s.json' % 'system_messages', 'w') as f:
-        json.dump(system_messages, f)
+    function_name = "get_latest_mail"
+    with open('../prompts/%s_prompt.json' % function_name, 'r') as f:
+        msg = json.load(f)
+
+    #chain_of_prompt = "以下是一个智能邮件项目的推理链，请你按照要求对其进行分析，提出修改意见：%s" % msg
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": "以下是一个智能邮件项目的推理链，请你按照要求对其进行分析，提出修改意见：%s" % msg}]
+    )
+    print(response.choices[0].message.content)
+
+    # wrong_code = msg['stage2'][1]['content']
+    # exec(wrong_code)
