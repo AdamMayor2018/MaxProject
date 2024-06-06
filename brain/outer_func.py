@@ -84,7 +84,7 @@ def search_internet(query, model="gpt-4o", token_limit=4096):
         for r in results:
             url = r["href"]
             content = get_search_content(url, model, token_limit=token_limit)
-            r['content'] = content
+            r.content = content
         # print("query:", results)
         return json.dumps(results)
 
