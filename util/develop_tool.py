@@ -15,6 +15,7 @@ from brain.outer_func import *
 import shutil
 from test import run_conversation
 
+
 def remove_to_tested(function_name):
     """
     将函数同名文件夹由untested文件夹转移至tested文件夹内。\
@@ -37,6 +38,10 @@ def remove_to_tested(function_name):
     # 移动文件夹
     print(src_dir, dst_dir)
     shutil.move(src_dir, dst_dir)
+
+    prompt_src_dir = '../prompts/untested/%s_prompt.json' % function_name
+    prompt_dst_dir = '../prompts/tested/%s_prompt.json' % function_name
+    shutil.move(prompt_src_dir, prompt_dst_dir)
 
 
 def extract_function_code(s, detail=0, tested=False, g=globals()):
@@ -130,7 +135,7 @@ def show_functions(tested=False, if_print=False):
     files_and_directories = os.listdir(directory)
     # 过滤结果，只保留.py文件和非__pycache__文件夹
     files_and_directories = [name.replace("_module.py", "") for name in files_and_directories if (
-            os.path.splitext(name)[1] == '.py'  and name != "__pycache__") and name != "__init__.py"]
+            os.path.splitext(name)[1] == '.py' and name != "__pycache__") and name != "__init__.py"]
 
     if if_print:
         for name in files_and_directories:
@@ -339,7 +344,8 @@ def function_test(client, function_name, req, few_shot, model="gpt-4o", g=global
         # messages = [{"role": "system", "content": "端木天的邮箱地址是:2323365771@qq.com"},
         #             {"role": "system", "content": "我的邮箱地址是:adamcx@foxmail.com"},
         #             {"role": "user", "content": user_content}]
-        messages = [{"role": "system", "content": "我现在已拿到QQ SMTP服务授权，授权码保存在python环境变量'QQ_MAIL_KEY'中。我的邮箱地址保存在python环境变量'QQ_EMAIL_ADDRESS'中"},
+        messages = [{"role": "system",
+                     "content": "我现在已拿到QQ SMTP服务授权，授权码保存在python环境变量'QQ_MAIL_KEY'中。我的邮箱地址保存在python环境变量'QQ_EMAIL_ADDRESS'中"},
                     {"role": "user", "content": user_content}]
         return messages
 
@@ -372,7 +378,8 @@ def function_test(client, function_name, req, few_shot, model="gpt-4o", g=global
                 if solution == '1':
                     # 再次运行函数创建过程
                     print("好的，正在尝试再次创建函数，请稍等...")
-                    few_shot_str = input("准备再次测试，请问是1.采用此前Few-shot方案，还是2.带入全部函数示例进行Few-shot？")
+                    few_shot_str = input(
+                        "准备再次测试，请问是1.采用此前Few-shot方案，还是2.带入全部函数示例进行Few-shot？")
                     if few_shot_str == '1':
                         function_name = code_generate(client, req=req, few_shot=few_shot, model=model, g=g)
                     else:
@@ -387,7 +394,8 @@ def function_test(client, function_name, req, few_shot, model="gpt-4o", g=global
                     function_test(client=client, function_name=function_name, req=req, few_shot=few_shot, g=g)
                 elif solution == '3':
                     new_req = input("好的，请再次输入用户需求，请注意，用户需求描述方法将极大程度影响最终函数创建结果。")
-                    few_shot_str = input("接下来如何运行代码创建函数？1.采用此前Few-shot方案；\n2.使用全部外部函数作为Few-shot")
+                    few_shot_str = input(
+                        "接下来如何运行代码创建函数？1.采用此前Few-shot方案；\n2.使用全部外部函数作为Few-shot")
                     if few_shot_str == '1':
                         function_name = code_generate(client=client, req=new_req, few_shot=few_shot, model=model, g=g)
                     else:
@@ -398,7 +406,8 @@ def function_test(client, function_name, req, few_shot, model="gpt-4o", g=global
 
     # run_conversation报错时则运行：
     except Exception as e:
-        next_step = input(f"run_conversation无法正常运行，提示报错为：{e}  接下来是1.再次运行运行run_conversation，还是2.进入debug流程？")
+        next_step = input(
+            f"run_conversation无法正常运行，提示报错为：{e}  接下来是1.再次运行运行run_conversation，还是2.进入debug流程？")
         if next_step == '1':
             function_test(client, function_name, req, few_shot)
         else:
@@ -437,7 +446,8 @@ def function_test(client, function_name, req, few_shot, model="gpt-4o", g=global
                 function_test(client=client, function_name=function_name, req=req, few_shot=few_shot, g=g)
             elif solution == '3':
                 new_req = input("好的，请再次输入用户需求，请注意，用户需求描述方法将极大程度影响最终函数创建结果。")
-                few_shot_str = input("接下来如何运行代码创建函数？1.采用此前Few-shot方案；\n2.使用全部外部函数作为Few-shot")
+                few_shot_str = input(
+                    "接下来如何运行代码创建函数？1.采用此前Few-shot方案；\n2.使用全部外部函数作为Few-shot")
                 if few_shot_str == '1':
                     function_name = code_generate(client=client, req=new_req, few_shot=few_shot, model=model, g=g)
                 else:
@@ -458,7 +468,7 @@ if __name__ == '__main__':
     os.environ["QQ_MAIL_KEY"] = conf_loader.attempt_load_param("qq-mail-key")
     os.environ["QQ_EMAIL_ADDRESS"] = conf_loader.attempt_load_param("qq-email-address")
     client = OpenAI()
-    req = "我现在已拿到QQ SMTP服务授权，授权码保存在python环境变量'QQ_MAIL_KEY'中。我的邮箱地址保存在python环境变量'QQ_EMAIL_ADDRESS'中, 请帮我统计下我的邮箱里面总共有几封未读邮件"
+    req = "我现在已拿到QQ SMTP服务授权，授权码保存在python环境变量'QQ_MAIL_KEY'中。我的邮箱地址保存在python环境变量'QQ_EMAIL_ADDRESS'中, 请帮我统计下我的收件箱里面总共有几封未读邮件"
     mail_auto_func(client, req)
     #
     # system_messages = {"system_message_CD": [{"role": "system",
@@ -470,7 +480,6 @@ if __name__ == '__main__':
     #
     # with open('../prompts/%s.json' % 'system_messages', 'w') as f:
     #     json.dump(system_messages, f)
-
 
     # LTM-CD
     # system_content1 = "为了更好编写满足用户需求的python函数，我们需要先识别用户需求中的变量，以作为python函数的参数，需要注意的是，当前编写的函数中" \
